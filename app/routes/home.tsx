@@ -1,4 +1,4 @@
-import SeriesNamePage from '../containers/SeriesNamePage';
+import MatchListPage from '~/containers/MatchListPage';
 
 export interface Series {
   name: string;
@@ -9,7 +9,5 @@ export interface Match {
 }
 
 export default function App() {
-  return (
-      <SeriesNamePage />
-  );
+  return <MatchListPage />;
 }

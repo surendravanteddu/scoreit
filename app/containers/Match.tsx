@@ -1,5 +1,5 @@
-import { useParams } from 'react-router';
-import { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router';
+import { useMemo, useState } from 'react';
 import { players } from '~/data/players';
 import { Scoring } from '~/components/match/Scoring';
 import { PlayerSelector } from '~/components/match/PlayerSelector';
@@ -7,6 +7,7 @@ import { Scorecard } from '~/components/match/Scorecard';
 import { ExtraScoringModal } from '~/components/match/ExtraScoringModal';
 import { ScoreHistory } from '~/components/match/ScoreHistory';
 import type { IBallHistory } from '~/types';
+import { teamsSelector } from '~/utils/utils';
 
 export default function Match() {
   const { seriesName } = useParams<{ seriesName: string }>();
@@ -22,6 +23,9 @@ export default function Match() {
   const [currentOver, setCurrentOver] = useState(0);
   const [ballsInOver, setBallsInOver] = useState(0);
   const [ballHistory, setBallHistory] = useState<Array<IBallHistory>>([]);
+  const [searchParams] = useSearchParams();
+  const playersCount = searchParams.get('playersCount') || '11';
+  const teams = useMemo(() => teamsSelector(parseInt(playersCount, 10), players), [playersCount]);
 
   const handleRun = (runs: number, type: 'run' | 'wide' | 'noBall' | 'wicket' = 'run') => {
     setScore((prev) => prev + runs);
@@ -92,14 +96,24 @@ export default function Match() {
 
       {/* Player Selection */}
       <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
-        <PlayerSelector players={players} player={striker} setPlayer={setStriker} label="Striker" />
         <PlayerSelector
-          players={players}
+          players={teams.team1}
+          player={striker}
+          setPlayer={setStriker}
+          label="Striker"
+        />
+        <PlayerSelector
+          players={teams.team1}
           player={nonStriker}
           setPlayer={setNonStriker}
           label="Non Striker"
         />
-        <PlayerSelector players={players} player={bowler} setPlayer={setBowler} label="Bowler" />
+        <PlayerSelector
+          players={teams.team2}
+          player={bowler}
+          setPlayer={setBowler}
+          label="Bowler"
+        />
       </div>
 
       {/* Score Display */}
